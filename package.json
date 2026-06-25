@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/jhodge10/amiibo-library#readme",
   "dependencies": {
+    "axios": "^1.18.1",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.1",
     "ejs": "^3.1.10",
