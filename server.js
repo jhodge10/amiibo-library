@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import routes from './routes/index.js';
 
 dotenv.config();
 
@@ -13,6 +14,8 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.render('home');
 });
+
+app.use('/', routes);
 
 const PORT = process.env.PORT || 3000;
 
