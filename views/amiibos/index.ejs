@@ -1,33 +1,33 @@
 <%- include('../partials/header') %>
 
+<div class="container">
+
 <h1>All Amiibos</h1>
 
-<div>
-  <% amiibos.forEach(amiibo => { %>
+<div class="card-grid">
 
-    <div style="margin-bottom:20px;">
-      <img
-        src="<%= amiibo.image %>"
-        alt="<%= amiibo.name %>"
-        width="100"
-      >
+<% amiibos.forEach(amiibo => { %>
 
-      <h3><%= amiibo.name %></h3>
+<div class="card">
 
-      <p>
-        Character:
-        <%= amiibo.character %>
-      </p>
+<img src="<%= amiibo.image %>" alt="<%= amiibo.name %>">
 
-      <p>
-        Series:
-        <%= amiibo.amiiboSeries %>
-      </p>
+<h3><%= amiibo.name %></h3>
 
-      <hr>
-    </div>
+<p><%= amiibo.character %></p>
 
-  <% }) %>
+<p><%= amiibo.amiiboSeries %></p>
+
+<a href="/amiibos/<%= amiibo.head %>/<%= amiibo.tail %>">
+View Details
+</a>
+
+</div>
+
+<% }) %>
+
+</div>
+
 </div>
 
 <%- include('../partials/footer') %>
