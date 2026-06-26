@@ -54,8 +54,8 @@ The application is built using Node.js, Express.js, EJS, PostgreSQL, and session
 
 ### External API
 
-* Amiibo API
-* https://www.amiiboapi.com/
+* [Amiibo API] (https://amiiboapi.org/api/amiibo/)
+* https://amiiboapi.org/api/amiibo/
 
 ### Deployment
 
