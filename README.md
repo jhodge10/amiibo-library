@@ -160,8 +160,6 @@ https://your-render-url.onrender.com
 
 ### GitHub Repository
 
-Add GitHub repository URL here:
-
 https://github.com/jhodge10/amiibo-library
 
 ---
