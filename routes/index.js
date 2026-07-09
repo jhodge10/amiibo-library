@@ -1,8 +1,15 @@
-import express from 'express';
-import amiiboRoutes from './amiiboRoutes.js';
+import express from "express";
+
+import amiiboRoutes from "./amiiboRoutes.js";
 
 const router = express.Router();
 
-router.use('/amiibos', amiiboRoutes);
+router.get("/", (req, res) => {
+    res.render("home", {
+        title: "Home"
+    });
+});
+
+router.use("/amiibos", amiiboRoutes);
 
 export default router;
