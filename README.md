@@ -68,7 +68,7 @@ The application is built using Node.js, Express.js, EJS, PostgreSQL, and session
 
 Insert your exported ERD image below after completing your database design.
 
-![Database ERD](images/ERD.png)
+![Database ERD](public/images/ERD.png)
 
 ### Main Tables
 
