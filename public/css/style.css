@@ -1069,3 +1069,28 @@ a {
     padding: 1.6rem;
   }
 }
+
+.empty-library {
+  padding: 4rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.empty-library > i {
+  margin-bottom: 1rem;
+  color: var(--primary);
+  font-size: 3rem;
+}
+
+.empty-library h2 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.empty-library p {
+  margin: 0.5rem 0 1.5rem;
+  color: var(--text-light);
+}

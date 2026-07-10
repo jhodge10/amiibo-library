@@ -46,6 +46,19 @@ app.use(session({
 
 }));
 
+app.use((req, res, next) => {
+  res.locals.currentUser = req.session.user || null;
+  res.locals.successMessage =
+    req.session.successMessage || null;
+  res.locals.errorMessage =
+    req.session.errorMessage || null;
+
+  delete req.session.successMessage;
+  delete req.session.errorMessage;
+
+  next();
+});
+
 app.use("/", routes);
 
 const PORT = process.env.PORT || 3000;

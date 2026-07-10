@@ -5,8 +5,8 @@
     <h1>Browse Amiibos</h1>
 
     <p>
-      Search the vault and mark amiibo for your future wishlist or
-      personal collection.
+      Search the vault and save amiibo to your wishlist
+      or personal collection.
     </p>
   </div>
 </section>
@@ -20,8 +20,8 @@
         <h2>Find an Amiibo</h2>
 
         <p>
-          Search by name or narrow the results using the available
-          filters.
+          Search by name or narrow the results using
+          the available filters.
         </p>
       </div>
 
@@ -60,11 +60,11 @@
 
           <% const gameSeries = [...new Set(
             amiibos
-              .map(amiibo => amiibo.gameSeries)
+              .map((amiibo) => amiibo.gameSeries)
               .filter(Boolean)
           )].sort(); %>
 
-          <% gameSeries.forEach(series => { %>
+          <% gameSeries.forEach((series) => { %>
             <option value="<%= series.toLowerCase() %>">
               <%= series %>
             </option>
@@ -80,11 +80,11 @@
 
           <% const amiiboTypes = [...new Set(
             amiibos
-              .map(amiibo => amiibo.type)
+              .map((amiibo) => amiibo.type)
               .filter(Boolean)
           )].sort(); %>
 
-          <% amiiboTypes.forEach(type => { %>
+          <% amiiboTypes.forEach((type) => { %>
             <option value="<%= type.toLowerCase() %>">
               <%= type %>
             </option>
@@ -104,14 +104,24 @@
       amiibo
     </p>
 
-    <p class="phase-message">
-      Wishlist and collection selections are visual during Phase 1.
-    </p>
+    <% if (!currentUser) { %>
+      <p class="phase-message">
+        Log in to save wishlist and collection selections.
+      </p>
+    <% } %>
   </div>
 
-  <div class="amiibo-grid" id="amiibo-grid">
+  <div
+    class="amiibo-grid"
+    id="amiibo-grid"
+    data-authenticated="<%= currentUser ? 'true' : 'false' %>"
+  >
 
-    <% amiibos.forEach(amiibo => { %>
+    <% amiibos.forEach((amiibo) => { %>
+
+      <% const amiiboId = `${amiibo.head}-${amiibo.tail}`; %>
+      <% const inWishlist = wishlistIds.includes(amiiboId); %>
+      <% const inCollection = collectionIds.includes(amiiboId); %>
 
       <article
         class="amiibo-card"
@@ -150,23 +160,23 @@
             <div class="amiibo-actions">
 
               <button
-                class="icon-button wishlist-button"
+                class="icon-button wishlist-button <%= inWishlist ? 'selected' : '' %>"
                 type="button"
-                aria-label="Add <%= amiibo.name %> to wishlist"
-                title="Add to wishlist"
-                data-selected="false"
+                title="<%= inWishlist ? 'Remove from wishlist' : 'Add to wishlist' %>"
+                data-selected="<%= inWishlist %>"
+                aria-label="<%= inWishlist ? 'Remove this amiibo from the wishlist' : 'Add this amiibo to the wishlist' %>"
               >
-                <i class="fa-regular fa-star"></i>
+                <i class="<%= inWishlist ? 'fa-solid' : 'fa-regular' %> fa-star"></i>
               </button>
 
               <button
-                class="icon-button collection-button"
+                class="icon-button collection-button <%= inCollection ? 'selected' : '' %>"
                 type="button"
-                aria-label="Add <%= amiibo.name %> to collection"
-                title="Add to collection"
-                data-selected="false"
+                title="<%= inCollection ? 'Remove from collection' : 'Add to collection' %>"
+                data-selected="<%= inCollection %>"
+                aria-label="<%= inCollection ? 'Remove this amiibo from the collection' : 'Add this amiibo to the collection' %>"
               >
-                <i class="fa-regular fa-heart"></i>
+                <i class="<%= inCollection ? 'fa-solid' : 'fa-regular' %> fa-heart"></i>
               </button>
 
             </div>
@@ -198,7 +208,7 @@
     <h2>No amiibo found</h2>
 
     <p>
-      Try changing your search text or clearing one of the filters.
+      Try changing your search or clearing the filters.
     </p>
 
     <button

@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   setupMobileNavigation();
-  setupFutureLinks();
   setupAmiiboFilters();
   setupAmiiboSelections();
 });
@@ -39,28 +38,13 @@ function setupMobileNavigation() {
 }
 
 /**
- * Prevents placeholder links from moving the user to the top of the page.
- * These links will become real routes during later phases.
- */
-function setupFutureLinks() {
-  const futureLinks = document.querySelectorAll(
-    '.future-link[aria-disabled="true"]'
-  );
-
-  futureLinks.forEach((link) => {
-    link.addEventListener("click", (event) => {
-      event.preventDefault();
-    });
-  });
-}
-
-/**
- * Provides live client-side searching and filtering on the Amiibo page.
+ * Provides live client-side searching and filtering.
  */
 function setupAmiiboFilters() {
   const grid = document.querySelector("#amiibo-grid");
+
   const cards = Array.from(
-    document.querySelectorAll(".amiibo-card")
+    document.querySelectorAll(".amiibo-card[data-name]")
   );
 
   const searchInput = document.querySelector("#amiibo-search");
@@ -69,6 +53,7 @@ function setupAmiiboFilters() {
   const visibleCount = document.querySelector("#visible-count");
   const noResults = document.querySelector("#no-results");
   const clearButton = document.querySelector("#clear-filters");
+
   const noResultsClearButton = document.querySelector(
     "#no-results-clear"
   );
@@ -78,9 +63,14 @@ function setupAmiiboFilters() {
   }
 
   function applyFilters() {
-    const searchText = searchInput?.value.trim().toLowerCase() || "";
-    const selectedSeries = seriesFilter?.value.toLowerCase() || "";
-    const selectedType = typeFilter?.value.toLowerCase() || "";
+    const searchText =
+      searchInput?.value.trim().toLowerCase() || "";
+
+    const selectedSeries =
+      seriesFilter?.value.toLowerCase() || "";
+
+    const selectedType =
+      typeFilter?.value.toLowerCase() || "";
 
     let numberVisible = 0;
 
@@ -102,7 +92,9 @@ function setupAmiiboFilters() {
         !selectedType || type === selectedType;
 
       const shouldShow =
-        matchesSearch && matchesSeries && matchesType;
+        matchesSearch &&
+        matchesSeries &&
+        matchesType;
 
       card.hidden = !shouldShow;
 
@@ -144,206 +136,192 @@ function setupAmiiboFilters() {
   seriesFilter?.addEventListener("change", applyFilters);
   typeFilter?.addEventListener("change", applyFilters);
   clearButton?.addEventListener("click", clearFilters);
-  noResultsClearButton?.addEventListener("click", clearFilters);
+
+  noResultsClearButton?.addEventListener(
+    "click",
+    clearFilters
+  );
 
   applyFilters();
 }
 
 /**
- * Gives wishlist and collection buttons their filled and empty states.
- *
- * During Phase 1, selections are stored in localStorage. In a later phase,
- * these actions will be saved to PostgreSQL for the logged-in user.
+ * Saves wishlist and collection selections to PostgreSQL.
  */
 function setupAmiiboSelections() {
-  const cards = document.querySelectorAll(".amiibo-card");
+  const grid = document.querySelector("#amiibo-grid");
 
-  if (cards.length === 0) {
+  if (!grid) {
     return;
   }
 
-  const savedWishlist = readStoredSelections(
-    "amiiboVaultWishlist"
+  const isAuthenticated =
+    grid.dataset.authenticated === "true";
+
+  const wishlistButtons = document.querySelectorAll(
+    ".wishlist-button"
   );
 
-  const savedCollection = readStoredSelections(
-    "amiiboVaultCollection"
+  const collectionButtons = document.querySelectorAll(
+    ".collection-button"
   );
 
-  cards.forEach((card) => {
-    const head = card.dataset.head;
-    const tail = card.dataset.tail;
+  wishlistButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!isAuthenticated) {
+        window.location.href = "/login";
+        return;
+      }
 
-    if (!head || !tail) {
-      return;
-    }
-
-    const amiiboId = `${head}-${tail}`;
-
-    const wishlistButton = card.querySelector(
-      ".wishlist-button"
-    );
-
-    const collectionButton = card.querySelector(
-      ".collection-button"
-    );
-
-    if (wishlistButton) {
-      setWishlistButtonState(
-        wishlistButton,
-        savedWishlist.includes(amiiboId)
-      );
-
-      wishlistButton.addEventListener("click", () => {
-        const isSelected =
-          wishlistButton.dataset.selected === "true";
-
-        updateStoredSelection(
-          "amiiboVaultWishlist",
-          amiiboId,
-          !isSelected
-        );
-
-        setWishlistButtonState(
-          wishlistButton,
-          !isSelected
-        );
-
-        animateIcon(wishlistButton);
+      await updateSelection({
+        button,
+        endpoint: "/amiibos/wishlist",
+        iconClass: "fa-star",
+        selectedTitle: "Remove from wishlist",
+        unselectedTitle: "Add to wishlist",
+        selectedLabel:
+          "Remove this amiibo from the wishlist",
+        unselectedLabel:
+          "Add this amiibo to the wishlist"
       });
-    }
+    });
+  });
 
-    if (collectionButton) {
-      setCollectionButtonState(
-        collectionButton,
-        savedCollection.includes(amiiboId)
-      );
+  collectionButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!isAuthenticated) {
+        window.location.href = "/login";
+        return;
+      }
 
-      collectionButton.addEventListener("click", () => {
-        const isSelected =
-          collectionButton.dataset.selected === "true";
-
-        updateStoredSelection(
-          "amiiboVaultCollection",
-          amiiboId,
-          !isSelected
-        );
-
-        setCollectionButtonState(
-          collectionButton,
-          !isSelected
-        );
-
-        animateIcon(collectionButton);
+      await updateSelection({
+        button,
+        endpoint: "/amiibos/collection",
+        iconClass: "fa-heart",
+        selectedTitle: "Remove from collection",
+        unselectedTitle: "Add to collection",
+        selectedLabel:
+          "Remove this amiibo from the collection",
+        unselectedLabel:
+          "Add this amiibo to the collection"
       });
-    }
+    });
   });
 }
 
 /**
- * Reads an array of Amiibo identifiers from localStorage.
+ * Sends one star or heart update to the server.
  */
-function readStoredSelections(storageKey) {
-  try {
-    const storedValue = localStorage.getItem(storageKey);
+async function updateSelection({
+  button,
+  endpoint,
+  iconClass,
+  selectedTitle,
+  unselectedTitle,
+  selectedLabel,
+  unselectedLabel
+}) {
+  const card = button.closest(".amiibo-card");
 
-    if (!storedValue) {
-      return [];
+  if (!card) {
+    return;
+  }
+
+  const head = card.dataset.head;
+  const tail = card.dataset.tail;
+
+  if (!head || !tail) {
+    return;
+  }
+
+  const isSelected =
+    button.dataset.selected === "true";
+
+  const nextSelected = !isSelected;
+
+  button.disabled = true;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        head,
+        tail,
+        selected: nextSelected
+      })
+    });
+
+    if (response.status === 401) {
+      window.location.href = "/login";
+      return;
     }
 
-    const parsedValue = JSON.parse(storedValue);
+    const result = await response.json();
 
-    return Array.isArray(parsedValue) ? parsedValue : [];
+    if (!response.ok || !result.success) {
+      throw new Error(
+        result.message || "The selection could not be saved."
+      );
+    }
+
+    setButtonState({
+      button,
+      selected: nextSelected,
+      iconClass,
+      selectedTitle,
+      unselectedTitle,
+      selectedLabel,
+      unselectedLabel
+    });
+
+    animateIcon(button);
   } catch (error) {
-    console.error(
-      `Unable to read ${storageKey} from localStorage:`,
-      error
-    );
+    console.error(error);
 
-    return [];
+    window.alert(
+      "The selection could not be saved. Please try again."
+    );
+  } finally {
+    button.disabled = false;
   }
 }
 
 /**
- * Adds or removes an Amiibo identifier from localStorage.
+ * Updates the filled or outlined icon state.
  */
-function updateStoredSelection(
-  storageKey,
-  amiiboId,
-  shouldInclude
-) {
-  const selections = readStoredSelections(storageKey);
-  const selectionSet = new Set(selections);
-
-  if (shouldInclude) {
-    selectionSet.add(amiiboId);
-  } else {
-    selectionSet.delete(amiiboId);
-  }
-
-  try {
-    localStorage.setItem(
-      storageKey,
-      JSON.stringify(Array.from(selectionSet))
-    );
-  } catch (error) {
-    console.error(
-      `Unable to save ${storageKey} in localStorage:`,
-      error
-    );
-  }
-}
-
-/**
- * Updates the appearance and accessibility text of a wishlist button.
- */
-function setWishlistButtonState(button, isSelected) {
+function setButtonState({
+  button,
+  selected,
+  iconClass,
+  selectedTitle,
+  unselectedTitle,
+  selectedLabel,
+  unselectedLabel
+}) {
   const icon = button.querySelector("i");
 
-  button.dataset.selected = String(isSelected);
-  button.classList.toggle("selected", isSelected);
+  button.dataset.selected = String(selected);
+  button.classList.toggle("selected", selected);
 
-  if (icon) {
-    icon.classList.toggle("fa-regular", !isSelected);
-    icon.classList.toggle("fa-solid", isSelected);
-  }
-
-  button.title = isSelected
-    ? "Remove from wishlist"
-    : "Add to wishlist";
+  button.title = selected
+    ? selectedTitle
+    : unselectedTitle;
 
   button.setAttribute(
     "aria-label",
-    isSelected
-      ? "Remove this amiibo from the wishlist"
-      : "Add this amiibo to the wishlist"
+    selected
+      ? selectedLabel
+      : unselectedLabel
   );
-}
-
-/**
- * Updates the appearance and accessibility text of a collection button.
- */
-function setCollectionButtonState(button, isSelected) {
-  const icon = button.querySelector("i");
-
-  button.dataset.selected = String(isSelected);
-  button.classList.toggle("selected", isSelected);
 
   if (icon) {
-    icon.classList.toggle("fa-regular", !isSelected);
-    icon.classList.toggle("fa-solid", isSelected);
+    icon.className = selected
+      ? `fa-solid ${iconClass}`
+      : `fa-regular ${iconClass}`;
   }
-
-  button.title = isSelected
-    ? "Remove from collection"
-    : "Add to collection";
-
-  button.setAttribute(
-    "aria-label",
-    isSelected
-      ? "Remove this amiibo from the collection"
-      : "Add this amiibo to the collection"
-  );
 }
 
 /**

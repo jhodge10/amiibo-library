@@ -3,6 +3,15 @@ import express from "express";
 import amiiboRoutes from "./amiiboRoutes.js";
 import authRoutes from "./authRoutes.js";
 
+import {
+  showWishlist,
+  showCollection
+} from "../controllers/amiiboController.js";
+
+import {
+  requireAuthentication
+} from "../middleware/auth.js";
+
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -11,12 +20,19 @@ router.get("/", (req, res) => {
   });
 });
 
-router.use("/amiibos", amiiboRoutes);
+router.get(
+  "/wishlist",
+  requireAuthentication,
+  showWishlist
+);
 
-/*
- * Because authRoutes already contains /login and /register,
- * mount it at the root path.
- */
+router.get(
+  "/collection",
+  requireAuthentication,
+  showCollection
+);
+
+router.use("/amiibos", amiiboRoutes);
 router.use("/", authRoutes);
 
 export default router;

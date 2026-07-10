@@ -1,0 +1,104 @@
+<section class="browse-hero">
+  <div class="browse-hero-content">
+    <p class="eyebrow">Saved for later</p>
+
+    <h1>My Wishlist</h1>
+
+    <p>
+      These are the amiibo you hope to add to your vault.
+    </p>
+  </div>
+</section>
+
+<section class="browse-section">
+
+  <% if (amiibos.length === 0) { %>
+
+    <div class="empty-library">
+      <i class="fa-regular fa-star"></i>
+
+      <h2>Your wishlist is empty</h2>
+
+      <p>
+        Browse the catalog and click a star to add an amiibo.
+      </p>
+
+      <a class="primary-button" href="/amiibos">
+        Browse Amiibos
+      </a>
+    </div>
+
+  <% } else { %>
+
+    <div
+      class="amiibo-grid"
+      id="amiibo-grid"
+      data-authenticated="true"
+    >
+
+      <% amiibos.forEach((amiibo) => { %>
+
+        <article
+          class="amiibo-card"
+          data-head="<%= amiibo.head %>"
+          data-tail="<%= amiibo.tail %>"
+        >
+
+          <div class="amiibo-image-wrapper">
+            <img
+              class="amiibo-image"
+              src="<%= amiibo.image %>"
+              alt="<%= amiibo.name %>"
+              loading="lazy"
+            >
+
+            <span class="amiibo-type-badge">
+              <%= amiibo.type %>
+            </span>
+          </div>
+
+          <div class="amiibo-card-content">
+
+            <div class="amiibo-card-heading">
+              <div>
+                <h2><%= amiibo.name %></h2>
+
+                <p class="amiibo-character">
+                  <%= amiibo.character %>
+                </p>
+              </div>
+
+              <button
+                class="icon-button wishlist-button selected"
+                type="button"
+                data-selected="true"
+                title="Remove from wishlist"
+                aria-label="Remove this amiibo from the wishlist"
+              >
+                <i class="fa-solid fa-star"></i>
+              </button>
+            </div>
+
+            <div class="amiibo-details">
+              <p>
+                <span>Game Series</span>
+                <strong><%= amiibo.gameSeries %></strong>
+              </p>
+
+              <p>
+                <span>Amiibo Series</span>
+                <strong><%= amiibo.amiiboSeries %></strong>
+              </p>
+            </div>
+
+          </div>
+
+        </article>
+
+      <% }) %>
+
+    </div>
+
+  <% } %>
+
+</section>
