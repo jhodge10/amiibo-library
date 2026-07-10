@@ -5,7 +5,7 @@
     <h1>My Collection</h1>
 
     <p>
-      View the amiibo currently saved in your collection.
+      View your collected amiibo and save personal reviews.
     </p>
   </div>
 </section>
@@ -38,8 +38,16 @@
 
       <% amiibos.forEach((amiibo) => { %>
 
+        <%
+          const amiiboId =
+            `${amiibo.head}-${amiibo.tail}`;
+
+          const savedReview =
+            reviewMap[amiiboId] || null;
+        %>
+
         <article
-          class="amiibo-card"
+          class="amiibo-card collection-review-card"
           data-head="<%= amiibo.head %>"
           data-tail="<%= amiibo.tail %>"
         >
@@ -89,6 +97,98 @@
                 <span>Amiibo Series</span>
                 <strong><%= amiibo.amiiboSeries %></strong>
               </p>
+            </div>
+
+            <div class="review-panel">
+              <h3>
+                <%= savedReview ? "Edit Review" : "Add Review" %>
+              </h3>
+
+              <form
+                class="review-form"
+                method="POST"
+                action="/reviews"
+              >
+                <input
+                  type="hidden"
+                  name="head"
+                  value="<%= amiibo.head %>"
+                >
+
+                <input
+                  type="hidden"
+                  name="tail"
+                  value="<%= amiibo.tail %>"
+                >
+
+                <div class="form-group">
+                  <label
+                    for="rating-<%= amiibo.head %>-<%= amiibo.tail %>"
+                  >
+                    Rating
+                  </label>
+
+                  <select
+                    id="rating-<%= amiibo.head %>-<%= amiibo.tail %>"
+                    name="rating"
+                    required
+                  >
+                    <option value="">Choose a rating</option>
+
+                    <% for (let rating = 1; rating <= 5; rating += 1) { %>
+                      <option
+                        value="<%= rating %>"
+                        <%= savedReview?.rating === rating ? "selected" : "" %>
+                      >
+                        <%= rating %> / 5
+                      </option>
+                    <% } %>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label
+                    for="review-<%= amiibo.head %>-<%= amiibo.tail %>"
+                  >
+                    Review
+                  </label>
+
+                  <textarea
+                    id="review-<%= amiibo.head %>-<%= amiibo.tail %>"
+                    name="reviewText"
+                    minlength="3"
+                    maxlength="500"
+                    rows="4"
+                    required
+                  ><%= savedReview?.review || "" %></textarea>
+                </div>
+
+                <button
+                  class="primary-button review-save-button"
+                  type="submit"
+                >
+                  <i class="fa-solid fa-floppy-disk"></i>
+
+                  <%= savedReview ? "Update Review" : "Save Review" %>
+                </button>
+              </form>
+
+              <% if (savedReview) { %>
+                <form
+                  class="delete-review-form"
+                  method="POST"
+                  action="/reviews/<%= savedReview.review_id %>/delete"
+                >
+                  <button
+                    class="delete-review-button"
+                    type="submit"
+                    onclick="return confirm('Delete this review?');"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                    Delete Review
+                  </button>
+                </form>
+              <% } %>
             </div>
 
           </div>

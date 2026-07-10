@@ -2,6 +2,7 @@ import express from "express";
 
 import amiiboRoutes from "./amiiboRoutes.js";
 import authRoutes from "./authRoutes.js";
+import reviewRoutes from "./reviewRoutes.js";
 
 import {
   showWishlist,
@@ -33,6 +34,7 @@ router.get(
 );
 
 router.use("/amiibos", amiiboRoutes);
+router.use("/reviews", reviewRoutes);
 router.use("/", authRoutes);
 
 export default router;

@@ -7,6 +7,10 @@ import {
   saveCollection
 } from "../models/userModel.js";
 
+import {
+  getUserReviews
+} from "../models/reviewModel.js";
+
 const API_URL = "https://amiiboapi.org/api/amiibo/";
 
 export async function getAllAmiibos(req, res, next) {
@@ -146,8 +150,13 @@ export async function showCollection(req, res, next) {
   try {
     const userId = req.session.user.userId;
 
-    const [collectionRows, response] = await Promise.all([
+    const [
+      collectionRows,
+      reviewRows,
+      response
+    ] = await Promise.all([
       getCollection(userId),
+      getUserReviews(userId),
       axios.get(API_URL)
     ]);
 
@@ -161,9 +170,19 @@ export async function showCollection(req, res, next) {
       collectionIds.has(`${amiibo.head}-${amiibo.tail}`)
     );
 
+    const reviewMap = {};
+
+    reviewRows.forEach((review) => {
+      const amiiboId =
+        `${review.amiibo_head}-${review.amiibo_tail}`;
+
+      reviewMap[amiiboId] = review;
+    });
+
     return res.render("collections/collection", {
       title: "My Collection",
-      amiibos
+      amiibos,
+      reviewMap
     });
   } catch (error) {
     return next(error);
