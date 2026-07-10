@@ -6,20 +6,20 @@ import {
 } from "../controllers/reviewController.js";
 
 import {
-  requireAuthentication
-} from "../middleware/auth.js";
+  requireCollectorOrAdmin
+} from "../middleware/admin.js";
 
 const router = express.Router();
 
 router.post(
   "/",
-  requireAuthentication,
+  requireCollectorOrAdmin,
   saveReview
 );
 
 router.post(
   "/:reviewId/delete",
-  requireAuthentication,
+  requireCollectorOrAdmin,
   deleteReview
 );
 

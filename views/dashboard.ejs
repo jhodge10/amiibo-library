@@ -1,0 +1,113 @@
+<section class="browse-hero">
+  <div class="browse-hero-content">
+    <p class="eyebrow">Your account</p>
+
+    <h1>My Dashboard</h1>
+
+    <p>
+      Submit requests and follow their progress.
+    </p>
+  </div>
+</section>
+
+<section class="dashboard-section">
+
+  <div class="dashboard-card">
+    <h2>Submit a Request</h2>
+
+    <p>
+      Request that a missing amiibo or site improvement
+      be reviewed by an administrator.
+    </p>
+
+    <form
+      class="dashboard-form"
+      method="POST"
+      action="/requests"
+    >
+      <div class="form-group">
+        <label for="subject">Subject</label>
+
+        <input
+          id="subject"
+          name="subject"
+          type="text"
+          minlength="3"
+          maxlength="100"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message</label>
+
+        <textarea
+          id="message"
+          name="message"
+          minlength="10"
+          maxlength="1000"
+          rows="5"
+          required
+        ></textarea>
+      </div>
+
+      <button class="primary-button" type="submit">
+        Submit Request
+      </button>
+    </form>
+  </div>
+
+  <div class="dashboard-card">
+    <h2>My Requests</h2>
+
+    <% if (requests.length === 0) { %>
+      <p class="muted-text">
+        You have not submitted any requests.
+      </p>
+    <% } %>
+
+    <div class="request-list">
+      <% requests.forEach((request) => { %>
+
+        <article class="request-card">
+          <div class="request-heading">
+            <h3><%= request.subject %></h3>
+
+            <span class="status-badge">
+              <%= request.status %>
+            </span>
+          </div>
+
+          <p><%= request.message %></p>
+
+          <small>
+            Submitted:
+            <%= new Date(
+              request.created_at
+            ).toLocaleString() %>
+          </small>
+
+          <div class="request-history">
+            <h4>Status History</h4>
+
+            <ul>
+              <% request.history.forEach((item) => { %>
+                <li>
+                  <strong><%= item.status %></strong>
+
+                  <span>
+                    <%= new Date(
+                      item.changed_at
+                    ).toLocaleString() %>
+                  </span>
+                </li>
+              <% }) %>
+            </ul>
+          </div>
+        </article>
+
+      <% }) %>
+    </div>
+  </div>
+
+</section>

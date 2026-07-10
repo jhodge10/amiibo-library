@@ -34,25 +34,56 @@
           Browse
         </a>
 
-        <a class="future-link" href="#" aria-disabled="true">
-          <i class="fa-solid fa-star"></i>
-          Wishlist
-        </a>
+        <% if (currentUser) { %>
+          <a href="/wishlist">
+            <i class="fa-solid fa-star"></i>
+            Wishlist
+          </a>
 
-        <a class="future-link" href="#" aria-disabled="true">
-          <i class="fa-solid fa-heart"></i>
-          Collection
-        </a>
+          <a href="/collection">
+            <i class="fa-solid fa-heart"></i>
+            Collection
+          </a>
+
+          <a href="/dashboard">
+            <i class="fa-solid fa-gauge"></i>
+            Dashboard
+          </a>
+
+          <% if (currentUser.role === "admin") { %>
+            <a href="/admin">
+              <i class="fa-solid fa-user-shield"></i>
+              Admin
+            </a>
+          <% } %>
+        <% } %>
       </div>
 
       <div class="account-links">
-        <a class="login-link future-link" href="#" aria-disabled="true">
-          Log In
-        </a>
+        <% if (currentUser) { %>
 
-        <a class="register-link future-link" href="#" aria-disabled="true">
-          Register
-        </a>
+          <span class="nav-user">
+            <i class="fa-solid fa-user"></i>
+            <%= currentUser.username %>
+          </span>
+
+          <form method="POST" action="/logout">
+            <button class="logout-button" type="submit">
+              Log Out
+            </button>
+          </form>
+
+        <% } else { %>
+
+          <a class="login-link" href="/login">
+            Log In
+          </a>
+
+          <a class="register-link" href="/register">
+            Register
+          </a>
+
+        <% } %>
       </div>
 
     </div>

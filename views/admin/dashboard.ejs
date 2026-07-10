@@ -1,0 +1,154 @@
+<section class="browse-hero">
+  <div class="browse-hero-content">
+    <p class="eyebrow">Management</p>
+
+    <h1>Admin Dashboard</h1>
+
+    <p>
+      Manage users, requests, and submitted reviews.
+    </p>
+  </div>
+</section>
+
+<section class="dashboard-section">
+
+  <div class="dashboard-card">
+    <h2>Users</h2>
+
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Update</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% users.forEach((user) => { %>
+            <tr>
+              <td><%= user.username %></td>
+              <td><%= user.email %></td>
+
+              <td>
+                <%= user.role %>
+              </td>
+
+              <td>
+                <form
+                  class="inline-admin-form"
+                  method="POST"
+                  action="/admin/users/<%= user.user_id %>/role"
+                >
+                  <select name="role">
+                    <% validRoles.forEach((role) => { %>
+                      <option
+                        value="<%= role %>"
+                        <%= user.role === role ? "selected" : "" %>
+                      >
+                        <%= role %>
+                      </option>
+                    <% }) %>
+                  </select>
+
+                  <button type="submit">
+                    Save
+                  </button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="dashboard-card">
+    <h2>Requests</h2>
+
+    <% if (requests.length === 0) { %>
+      <p class="muted-text">
+        No requests have been submitted.
+      </p>
+    <% } %>
+
+    <div class="admin-item-list">
+      <% requests.forEach((request) => { %>
+
+        <article class="admin-item">
+          <h3><%= request.subject %></h3>
+
+          <p>
+            Submitted by
+            <strong><%= request.username %></strong>
+          </p>
+
+          <p><%= request.message %></p>
+
+          <form
+            class="inline-admin-form"
+            method="POST"
+            action="/admin/requests/<%= request.request_id %>/status"
+          >
+            <select name="status">
+              <% validRequestStatuses.forEach((status) => { %>
+                <option
+                  value="<%= status %>"
+                  <%= request.status === status ? "selected" : "" %>
+                >
+                  <%= status %>
+                </option>
+              <% }) %>
+            </select>
+
+            <button type="submit">
+              Update Status
+            </button>
+          </form>
+        </article>
+
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="dashboard-card">
+    <h2>Review Moderation</h2>
+
+    <% if (reviews.length === 0) { %>
+      <p class="muted-text">
+        No reviews have been submitted.
+      </p>
+    <% } %>
+
+    <div class="admin-item-list">
+      <% reviews.forEach((review) => { %>
+
+        <article class="admin-item">
+          <h3>
+            <%= review.username %> —
+            <%= review.rating %>/5
+          </h3>
+
+          <p><%= review.review %></p>
+
+          <form
+            method="POST"
+            action="/admin/reviews/<%= review.review_id %>/delete"
+          >
+            <button
+              class="delete-review-button"
+              type="submit"
+              onclick="return confirm('Delete this review?');"
+            >
+              Delete Review
+            </button>
+          </form>
+        </article>
+
+      <% }) %>
+    </div>
+  </div>
+
+</section>
