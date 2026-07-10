@@ -1,42 +1,61 @@
-# Amiibo Collector Hub
+# Amiibo Vault
 
 ## Project Description
 
-Amiibo Collector Hub is a full-stack web application designed for Nintendo amiibo collectors. The application uses the Amiibo API to display information about amiibo figures, cards, and yarn collectibles. Users can create accounts, manage their personal amiibo collections, submit reviews, and participate in a trade request system.
+Amiibo Vault is a full-stack, server-side rendered web application designed for Nintendo amiibo collectors.
 
-The site includes role-based access control with administrators, moderators, and standard users. Administrators can manage users, monitor content, and oversee trade requests. Moderators can review and remove inappropriate content. Standard users can build collections, submit reviews, and participate in trades.
+The application retrieves amiibo information from the external Amiibo API. Visitors can browse, search, and filter amiibo figures, cards, and other collectible types.
 
-The application is built using Node.js, Express.js, EJS, PostgreSQL, and session-based authentication.
+Registered users can create a personal wishlist, track the amiibo in their collection, and submit requests through a multi-stage workflow. Collector accounts can also create, edit, and delete reviews. Administrators can manage user roles, update request statuses, and moderate reviews.
+
+Amiibo Vault was created as the final project for CSE 340 Web Backend Development.
+
+---
+
+## Live Website
+
+`https://amiibo-vault.onrender.com/`
 
 ---
 
 ## Features
 
-### User Features
+### Public Features
 
-* Register and log in to an account
-* View amiibo information from the Amiibo API
-* Search and filter amiibo by character, series, game series, and type
-* Create and manage a personal amiibo collection
-* Add amiibo to a wishlist
-* Submit reviews and ratings
-* Edit and delete personal reviews
-* Submit trade requests
-* Track trade request status
+- Browse amiibo information from the Amiibo API
+- Search by amiibo name or character
+- Filter by game series
+- Filter by amiibo type
+- Create an account
+- Log in securely
 
-### Moderator Features
+### Standard User Features
 
-* Review reported content
-* Remove inappropriate reviews
-* Monitor user-generated content
+- Manage a personal amiibo wishlist
+- Manage a personal amiibo collection
+- Submit requests to an administrator
+- View the current status of submitted requests
+- View the complete status history of each request
+
+### Collector Features
+
+Collectors have all standard-user permissions and can also:
+
+- Create reviews for amiibo in their collection
+- Give ratings from 1 to 5
+- Edit their own reviews
+- Delete their own reviews
 
 ### Administrator Features
 
-* Manage users and user roles
-* View all trade requests
-* Approve or reject trade requests
-* Remove inappropriate content
-* Access administrative dashboard and reports
+Administrators can:
+
+- Access the admin dashboard
+- View registered users
+- Assign user roles
+- View submitted requests
+- Update request statuses
+- Moderate and delete user reviews
 
 ---
 
@@ -44,145 +63,239 @@ The application is built using Node.js, Express.js, EJS, PostgreSQL, and session
 
 ### Backend
 
-* Node.js
-* Express.js
-* EJS
-* PostgreSQL
-* Express Session
-* bcrypt
-* dotenv
+- Node.js
+- Express.js
+- EJS
+- PostgreSQL
+- JavaScript
+
+### Authentication and Security
+
+- express-session
+- connect-pg-simple
+- bcrypt
+- dotenv
 
 ### External API
 
-* [Amiibo API](https://amiiboapi.org/api/amiibo/)
-* https://amiiboapi.org/api/amiibo/
+Amiibo information is retrieved from:
+
+`https://amiiboapi.org/api/amiibo/`
 
 ### Deployment
 
-* Render
-* PostgreSQL Database
+- Render Web Service
+- Render PostgreSQL
 
 ---
 
 ## Database Schema
 
-Insert your exported ERD image below after completing your database design.
-
-![Database ERD](public/images/ERD.png)
+![Amiibo Vault ERD](./public/images/ERD.png)
 
 ### Main Tables
 
-* users
-* collections
-* reviews
-* trade_requests
-* reports
+#### `users`
+
+Stores:
+
+- Account usernames
+- Email addresses
+- Hashed passwords
+- User roles
+- Account creation dates
+
+#### `user_amiibos`
+
+Connects users to amiibo identifiers and stores whether each amiibo is:
+
+- In the user's wishlist
+- In the user's collection
+- In both lists
+
+#### `reviews`
+
+Stores:
+
+- The user who submitted the review
+- The amiibo head and tail identifiers
+- Rating from 1 to 5
+- Review text
+- Creation date
+
+#### `requests`
+
+Stores user-submitted requests and their current workflow status.
+
+#### `request_history`
+
+Stores every status change made to a request, including the date of the change.
+
+#### `user_sessions`
+
+Stores authenticated user sessions in PostgreSQL.
+
+This table is created automatically by `connect-pg-simple`.
+
+---
+
+## Database Relationships
+
+- One user can have many saved amiibo records.
+- One user can create many reviews.
+- One user can submit many requests.
+- One request can have many request-history entries.
+- Deleting a user also deletes their saved amiibo, reviews, and requests.
+- If the user who changed a request status is deleted, the request-history entry remains and its `changed_by` value is set to `NULL`.
 
 ---
 
 ## User Roles
 
-### Administrator
-
-Permissions:
-
-* Manage all users
-* Assign user roles
-* Delete content
-* Approve and reject trade requests
-* Access administrative dashboard
-
-### Moderator
-
-Permissions:
-
-* Review user-generated content
-* Remove inappropriate reviews
-* Moderate reports
-
 ### Standard User
 
-Permissions:
+A standard user can:
 
-* Manage personal collection
-* Create reviews
-* Submit trade requests
-* Manage account information
+- Browse amiibo
+- Manage a wishlist
+- Manage a collection
+- Submit requests
+- View request status and history
+
+### Collector
+
+A collector can:
+
+- Perform all standard-user actions
+- Create reviews
+- Edit their own reviews
+- Delete their own reviews
+
+### Administrator
+
+An administrator can:
+
+- Perform all collector actions
+- Manage user roles
+- View all submitted requests
+- Update request statuses
+- Moderate and delete reviews
+- Access the administrative dashboard
 
 ---
 
-## Workflow System
+## Request Workflow
 
-### Trade Request Workflow
+Amiibo Vault includes a multi-stage request workflow.
 
-The application includes a multi-stage trade request system.
+A request can move through the following statuses:
 
-Status options:
+1. Submitted
+2. Under Review
+3. Approved
+4. Rejected
+5. Completed
 
-1. Pending
-2. Approved
-3. Rejected
-4. Completed
-
-Users can submit trade requests and monitor their current status through their dashboard.
+Every status change is saved in the `request_history` table. Users can view both the current request status and its full history from their dashboard.
 
 ---
 
-Test Account Credentials
+## Test Accounts
 
-All test accounts use the following password:
+All test-account passwords are provided separately to the instructor and are not stored in this repository.
 
-Password:
+### Administrator Account
 
-P@$$w0rd!
+Email:
+
+`admin@amiibovault.test`
+
+### Collector Account
+
+Email:
+
+`collector@amiibovault.test`
+
+### Standard User Account
+
+Email:
+
+`user@amiibovault.test`
 
 ---
 
 ## Security Features
 
-* Session-based authentication
-* Password hashing using bcrypt
-* Protected routes
-* Role-based authorization
-* Parameterized PostgreSQL queries
-* Input validation and sanitization
-* Global error handling
+- Session-based authentication
+- PostgreSQL-backed session storage
+- Password hashing with bcrypt
+- HTTP-only session cookies
+- Role-based authorization
+- Protected routes
+- Parameterized PostgreSQL queries
+- Server-side form validation
+- Review ownership checks
+- Centralized server error handling
+- Environment variables for database credentials and session secrets
 
 ---
 
-## Deployment
+## Local Installation
 
-### Live Site
+### 1. Clone the repository
 
-Add Render URL here: TBD
+```bash
+git clone https://github.com/jhodge10/amiibo-library.git
+2. Enter the project directory
+cd amiibo-library
+3. Install dependencies
+npm install
+4. Create the PostgreSQL database
 
-https://your-render-url.onrender.com
+Create a local PostgreSQL database named:
 
-### GitHub Repository
+amiibo_vault
+5. Create the database tables
+
+Run the following file against the amiibo_vault database:
+
+database/schema.sql
+6. Create the environment file
+
+Create a .env file in the root project directory:
+
+PORT=3000
+DATABASE_URL=postgres://postgres:YOUR_PASSWORD@localhost:5432/amiibo_vault
+SESSION_SECRET=replace_with_a_long_random_secret
+
+The .env file must not be committed to GitHub.
+
+7. Start the development server
+npm run dev
+8. Open the website
+http://localhost:3000
+GitHub Repository
 
 https://github.com/jhodge10/amiibo-library
 
----
-
-## Known Limitations
-
-* Additional search filters may be added in future updates.
-* Trading system currently tracks requests but does not provide direct messaging between users.
-* Amiibo information depends on availability of the external Amiibo API.
-
----
-
-## Future Enhancements
-
-* Direct user-to-user messaging
-* Collection statistics and analytics
-* Amiibo rarity tracking
-* Advanced search and filtering
-* Image upload support for trade listings
-
----
-
-## Author
+Known Limitations
+Amiibo catalog information depends on the availability of the external Amiibo API.
+The main browse page currently displays the first 60 amiibo returned by the API.
+Review permissions are limited to collector and administrator accounts.
+Requests must be manually reviewed and updated by an administrator.
+The application does not currently support profile editing.
+The application does not support user-uploaded images.
+Trading and direct messaging are not included.
+Future Enhancements
+Pagination for the complete amiibo catalog
+Additional sorting and filtering
+Public review pages
+User profile editing
+Collection statistics
+Email notifications for request updates
+Optional amiibo trading features
+Direct user messaging
+Author
 
 Jerry Hodges
 
