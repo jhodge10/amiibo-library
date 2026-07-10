@@ -1,33 +1,213 @@
-<%- include('../partials/header') %>
+<section class="browse-hero">
+  <div class="browse-hero-content">
+    <p class="eyebrow">Explore the catalog</p>
 
-<div class="container">
+    <h1>Browse Amiibos</h1>
 
-<h1>All Amiibos</h1>
+    <p>
+      Search the vault and mark amiibo for your future wishlist or
+      personal collection.
+    </p>
+  </div>
+</section>
 
-<div class="card-grid">
+<section class="browse-section">
 
-<% amiibos.forEach(amiibo => { %>
+  <div class="filter-panel">
 
-<div class="card">
+    <div class="filter-heading">
+      <div>
+        <h2>Find an Amiibo</h2>
 
-<img src="<%= amiibo.image %>" alt="<%= amiibo.name %>">
+        <p>
+          Search by name or narrow the results using the available
+          filters.
+        </p>
+      </div>
 
-<h3><%= amiibo.name %></h3>
+      <button
+        class="clear-filters-button"
+        id="clear-filters"
+        type="button"
+      >
+        <i class="fa-solid fa-rotate-left"></i>
+        Clear Filters
+      </button>
+    </div>
 
-<p><%= amiibo.character %></p>
+    <div class="filter-controls">
 
-<p><%= amiibo.amiiboSeries %></p>
+      <div class="form-group search-group">
+        <label for="amiibo-search">Search</label>
 
-<a href="/amiibos/<%= amiibo.head %>/<%= amiibo.tail %>">
-View Details
-</a>
+        <div class="input-with-icon">
+          <i class="fa-solid fa-magnifying-glass"></i>
 
-</div>
+          <input
+            id="amiibo-search"
+            type="search"
+            placeholder="Search by name or character..."
+            autocomplete="off"
+          >
+        </div>
+      </div>
 
-<% }) %>
+      <div class="form-group">
+        <label for="series-filter">Game Series</label>
 
-</div>
+        <select id="series-filter">
+          <option value="">All Game Series</option>
 
-</div>
+          <% const gameSeries = [...new Set(
+            amiibos
+              .map(amiibo => amiibo.gameSeries)
+              .filter(Boolean)
+          )].sort(); %>
 
-<%- include('../partials/footer') %>
+          <% gameSeries.forEach(series => { %>
+            <option value="<%= series.toLowerCase() %>">
+              <%= series %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="type-filter">Amiibo Type</label>
+
+        <select id="type-filter">
+          <option value="">All Types</option>
+
+          <% const amiiboTypes = [...new Set(
+            amiibos
+              .map(amiibo => amiibo.type)
+              .filter(Boolean)
+          )].sort(); %>
+
+          <% amiiboTypes.forEach(type => { %>
+            <option value="<%= type.toLowerCase() %>">
+              <%= type %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="results-toolbar">
+    <p>
+      Showing
+      <strong id="visible-count"><%= amiibos.length %></strong>
+      of
+      <strong><%= amiibos.length %></strong>
+      amiibo
+    </p>
+
+    <p class="phase-message">
+      Wishlist and collection selections are visual during Phase 1.
+    </p>
+  </div>
+
+  <div class="amiibo-grid" id="amiibo-grid">
+
+    <% amiibos.forEach(amiibo => { %>
+
+      <article
+        class="amiibo-card"
+        data-name="<%= amiibo.name.toLowerCase() %>"
+        data-character="<%= amiibo.character.toLowerCase() %>"
+        data-series="<%= amiibo.gameSeries.toLowerCase() %>"
+        data-type="<%= amiibo.type.toLowerCase() %>"
+        data-head="<%= amiibo.head %>"
+        data-tail="<%= amiibo.tail %>"
+      >
+
+        <div class="amiibo-image-wrapper">
+          <img
+            class="amiibo-image"
+            src="<%= amiibo.image %>"
+            alt="<%= amiibo.name %>"
+            loading="lazy"
+          >
+
+          <span class="amiibo-type-badge">
+            <%= amiibo.type %>
+          </span>
+        </div>
+
+        <div class="amiibo-card-content">
+
+          <div class="amiibo-card-heading">
+            <div>
+              <h2><%= amiibo.name %></h2>
+
+              <p class="amiibo-character">
+                <%= amiibo.character %>
+              </p>
+            </div>
+
+            <div class="amiibo-actions">
+
+              <button
+                class="icon-button wishlist-button"
+                type="button"
+                aria-label="Add <%= amiibo.name %> to wishlist"
+                title="Add to wishlist"
+                data-selected="false"
+              >
+                <i class="fa-regular fa-star"></i>
+              </button>
+
+              <button
+                class="icon-button collection-button"
+                type="button"
+                aria-label="Add <%= amiibo.name %> to collection"
+                title="Add to collection"
+                data-selected="false"
+              >
+                <i class="fa-regular fa-heart"></i>
+              </button>
+
+            </div>
+          </div>
+
+          <div class="amiibo-details">
+            <p>
+              <span>Game Series</span>
+              <strong><%= amiibo.gameSeries %></strong>
+            </p>
+
+            <p>
+              <span>Amiibo Series</span>
+              <strong><%= amiibo.amiiboSeries %></strong>
+            </p>
+          </div>
+
+        </div>
+
+      </article>
+
+    <% }) %>
+
+  </div>
+
+  <div class="no-results" id="no-results" hidden>
+    <i class="fa-solid fa-magnifying-glass"></i>
+
+    <h2>No amiibo found</h2>
+
+    <p>
+      Try changing your search text or clearing one of the filters.
+    </p>
+
+    <button
+      class="secondary-button"
+      id="no-results-clear"
+      type="button"
+    >
+      Clear Filters
+    </button>
+  </div>
+
+</section>

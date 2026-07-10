@@ -1,0 +1,40 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+
+<h1>Create Account</h1>
+
+<form method="POST" action="/register">
+
+<label>Username</label>
+
+<input
+type="text"
+name="username"
+required>
+
+<label>Email</label>
+
+<input
+type="email"
+name="email"
+required>
+
+<label>Password</label>
+
+<input
+type="password"
+name="password"
+required>
+
+<button type="submit">
+
+Register
+
+</button>
+
+</form>
+
+</div>
+
+<%- include('../partials/footer') %>
