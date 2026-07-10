@@ -1,0 +1,67 @@
+<section class="auth-section">
+  <div class="auth-card">
+
+    <div class="auth-heading">
+      <p class="eyebrow">Return to your vault</p>
+
+      <h1>Log In</h1>
+
+      <p>
+        Access your saved wishlist and personal collection.
+      </p>
+    </div>
+
+    <% if (validationErrors.length > 0) { %>
+      <div class="message message-error" role="alert">
+        <ul>
+          <% validationErrors.forEach(error => { %>
+            <li><%= error %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <form
+      class="auth-form"
+      method="POST"
+      action="/login"
+    >
+      <div class="form-group">
+        <label for="email">Email address</label>
+
+        <input
+          id="email"
+          name="email"
+          type="email"
+          maxlength="100"
+          value="<%= email %>"
+          autocomplete="email"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button class="primary-button auth-submit" type="submit">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        Log In
+      </button>
+    </form>
+
+    <p class="auth-switch">
+      Need an account?
+      <a href="/register">Register</a>
+    </p>
+
+  </div>
+</section>

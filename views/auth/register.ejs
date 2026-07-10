@@ -1,40 +1,105 @@
-<%- include('../partials/header') %>
+<section class="auth-section">
+  <div class="auth-card">
 
-<div class="container">
+    <div class="auth-heading">
+      <p class="eyebrow">Create your vault</p>
 
-<h1>Create Account</h1>
+      <h1>Register</h1>
 
-<form method="POST" action="/register">
+      <p>
+        Create an account to save your wishlist and collection.
+      </p>
+    </div>
 
-<label>Username</label>
+    <% if (validationErrors.length > 0) { %>
+      <div class="message message-error" role="alert">
+        <strong>Please correct the following:</strong>
 
-<input
-type="text"
-name="username"
-required>
+        <ul>
+          <% validationErrors.forEach(error => { %>
+            <li><%= error %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
 
-<label>Email</label>
+    <form
+      class="auth-form"
+      method="POST"
+      action="/register"
+    >
+      <div class="form-group">
+        <label for="username">Username</label>
 
-<input
-type="email"
-name="email"
-required>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          minlength="3"
+          maxlength="50"
+          value="<%= formData.username %>"
+          autocomplete="username"
+          required
+        >
+      </div>
 
-<label>Password</label>
+      <div class="form-group">
+        <label for="email">Email address</label>
 
-<input
-type="password"
-name="password"
-required>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          maxlength="100"
+          value="<%= formData.email %>"
+          autocomplete="email"
+          required
+        >
+      </div>
 
-<button type="submit">
+      <div class="form-group">
+        <label for="password">Password</label>
 
-Register
+        <input
+          id="password"
+          name="password"
+          type="password"
+          minlength="8"
+          autocomplete="new-password"
+          required
+        >
 
-</button>
+        <small>
+          Use at least eight characters, including uppercase,
+          lowercase, and a number.
+        </small>
+      </div>
 
-</form>
+      <div class="form-group">
+        <label for="confirmPassword">
+          Confirm password
+        </label>
 
-</div>
+        <input
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          minlength="8"
+          autocomplete="new-password"
+          required
+        >
+      </div>
 
-<%- include('../partials/footer') %>
+      <button class="primary-button auth-submit" type="submit">
+        <i class="fa-solid fa-user-plus"></i>
+        Create Account
+      </button>
+    </form>
+
+    <p class="auth-switch">
+      Already have an account?
+      <a href="/login">Log in</a>
+    </p>
+
+  </div>
+</section>
